@@ -31,13 +31,13 @@ class CategoryController extends Controller
     {
         try {
             $validate = Validator::make($request->all(), [
-                'kategori' => 'required|unique:categories',
+                'kategori' => 'required',
             ]);
 
             if ($validate->fails()) {
                 $response = [
                     'status' => false,
-                    'message' => $validate->errors
+                    'message' => $validate->errors()
                 ];
 
                 return response()->json($respons, 500);

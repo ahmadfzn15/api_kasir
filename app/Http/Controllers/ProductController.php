@@ -14,7 +14,12 @@ class ProductController extends Controller
     {
         try {
             $user = $request->user();
-            $produk = Product::where('id_toko', $user->id_toko)->get();
+            $produk = [];
+            if ($request->query('category') != 0) {
+                $produk = Product::where('id_toko', $user->id_toko)->where('id_kategori', $request->query('category'))->latest()->get();
+            } else {
+                $produk = Product::where('id_toko', $user->id_toko)->latest()->get();
+            }
 
             $response = [
                 "status" => true,
@@ -69,7 +74,7 @@ class ProductController extends Controller
             if ($validate->fails()) {
                 $response = [
                     'status' => false,
-                    'message' => $validate->errors
+                    'message' => $validate->errors()
                 ];
 
                 return response()->json($respons, 500);
@@ -115,9 +120,10 @@ class ProductController extends Controller
     public function update(int $id, Request $request)
     {
         try {
-            return response()->json(["message" => $request->all()], 500);
             $validate = Validator::make($request->all(), [
-                'namaProduk' => 'required|string',
+                'foto' => 'nullable|image|mimes:png,jpg,jpeg',
+                'namaProduk' => 'required',
+                'id_kategori' => 'required',
                 'harga_beli' => 'required',
                 'harga_jual' => 'required',
             ]);
@@ -132,7 +138,26 @@ class ProductController extends Controller
             }
 
             $product = Product::findOrFail($id);
-            $product->update($request->all());
+            $imageName = null;
+            if ($request->hasFile('foto')) {
+                if ($product->foto) {
+                    Storage::delete("img/" . $product->foto);
+                }
+                $image = $request->file('foto');
+                $imageName = time().'.'.$image->getClientOriginalExtension();
+                $image->storeAs('public/img', $imageName);
+            }
+
+            $product->update([
+                "foto" => $imageName,
+                "namaProduk" => $request->namaProduk,
+                "barcode" => $request->barcode,
+                "id_kategori" => $request->id_kategori,
+                "harga_beli" => $request->harga_beli,
+                "harga_jual" => $request->harga_jual,
+                "deskripsi" => $request->deskripsi,
+                "stok" => $request->stok
+            ]);
 
             $response = [
                 'status' => true,

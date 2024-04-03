@@ -10,44 +10,23 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Notifications\EmailVerification;
 use Validator;
 
 class AuthController extends Controller
 {
-    public function index(Request $request) {
-        try {
-            $user = $request->user();
-
-            $response = [
-                "success" => true,
-                "data" => $user,
-                "message" => "Data User"
-            ];
-
-            return response()->json($response, 200);
-        } catch (\Throwable $th) {
-            $response = [
-                "success" => false,
-                "data" => $user,
-                "message" => "Gagal mengambil data user"
-            ];
-
-            return response()->json($response, 500);
-        }
-    }
-
     public function login(Request $request)
     {
         try {
             $validated = Validator::make($request->all(), [
-                'username' => 'required|string',
+                'email' => 'required|string',
                 'password' => 'required|string'
             ]);
 
             if ($validated->fails()) {
                 $response = [
                     'success' => false,
-                    'message' => "Username dan password wajib diisi!"
+                    'message' => "Email dan password wajib diisi!"
                 ];
 
                 return response()->json($response, 500);
@@ -56,13 +35,13 @@ class AuthController extends Controller
             if (!Auth::attempt($request->all())) {
                 $response = [
                     'success' => false,
-                    'message' => "Username atau password yang anda masukkan salah."
+                    'message' => "Email atau password yang anda masukkan salah."
                 ];
 
                 return response()->json($response, 500);
             }
 
-            $user = User::where('username', $request->username)->first();
+            $user = User::where('email', $request->email)->first();
             $token = $user->createToken('authToken')->plainTextToken;
 
             $response = [
@@ -71,7 +50,7 @@ class AuthController extends Controller
                     "token" => $token,
                     "role" => $user->role,
                 ],
-                "message" => "Login Berhasil"
+                "message" => "Login Berhasil, Selamat Datang Kembali " . $user->nama
             ];
 
             return response()->json($response, 200);
@@ -89,31 +68,44 @@ class AuthController extends Controller
     {
         try {
             $validated = Validator::make($request->all(), [
-                'username' => ['required', 'string', 'max:255', 'unique:users'],
-                'email' => ['nullable', 'email', 'unique:users'],
+                'nama' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'email:rfc', 'unique:users'],
                 'password' => ['required'],
             ]);
 
             if ($validated->fails()) {
                 $response = [
                     'success' => false,
-                    'message' => $validated->errors
+                    'message' => $validated->errors()
                 ];
 
                 return response()->json($response, 500);
             }
 
+            $code = mt_rand(000000, 999999);
             $user = User::create([
-                'username' => $request->username,
+                'nama' => $request->nama,
+                'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'role' => 'admin',
+                'code' => $code
             ]);
 
-            event(new Registered($user));
+            $user->notify(new EmailVerification($user));
 
             Auth::login($user);
+            $token = $user->createToken('authToken')->plainTextToken;
 
-            return response()->json("Daftar berhasil.", 200);
+            $response = [
+                "success" => true,
+                "data" => [
+                    "token" => $token,
+                    "role" => $user->role,
+                ],
+                "message" => "Daftar Berhasil"
+            ];
+
+            return response()->json($response, 200);
         } catch (\Throwable $th) {
             $response = [
                 'success' => false,
@@ -124,89 +116,86 @@ class AuthController extends Controller
         }
     }
 
-    public function update(Request $request)
-    {
-        $user = $request->user();
+    public function logout(Request $request) {
         try {
-            $validated = Validator::make($request->all(), [
-                'foto' => 'nullable|image|mimes:png,jpg,jpeg',
-                'username' => 'required|string|max:255',
-                'email' => 'nullable|email',
-            ]);
-
-            // if ($validated->fails()) {
-            //     $response = [
-            //         'success' => false,
-            //         'message' => $validated->errors
-            //     ];
-
-            //     return response()->json($response, 500);
-            // }
-
-            $imageName = null;
-            if ($request->hasFile('foto')) {
-                if ($user->foto) {
-                    Storage::delete("img/" . $user->foto);
-                }
-                $image = $request->file('foto');
-                $imageName = time().'.'.$image->getClientOriginalExtension();
-                $image->storeAs('public/img', $imageName);
-            }
-
-            User::findOrFail($user->id)->update([
-                'foto' => $imageName,
-                'username' => $request->username,
-                'email' => $request->email,
-                'no_tlp' => $request->no_tlp,
-            ]);
+            $request->user()->currentAccessToken()->delete();
 
             $response = [
-                "success" => true,
-                "message" => "Profil berhasil diubah."
+                'success' => true,
+                'message' => "Logout berhasil"
             ];
 
             return response()->json($response, 200);
         } catch (\Throwable $th) {
             $response = [
-                "success" => false,
-                "message" => "Profil gagal diubah"
+                'success' => false,
+                'message' => "Logout gagal"
             ];
 
             return response()->json($response, 500);
         }
     }
 
-    public function destroy(int $id, Request $request)
+    public function verify(Request $request)
     {
-        $res = Auth::attempt(["email" => $user->email, "password" => $request->password]);
+        try {
+            $request->validate([
+                "code" => "required|string|max:6"
+            ]);
 
-        if ($res) {
-            $user->delete();
+            $verify = auth()->user()->code == $request->code;
+
+            if ($verify) {
+                $response = [
+                    'success' => true,
+                    'message' => "Verifikasi email berhasil"
+                ];
+
+                return response()->json($response, 200);
+            } else {
+                $response = [
+                    'success' => true,
+                    'message' => "Kode yang anda masukkan salah"
+                ];
+
+                return response()->json($response, 500);
+            }
+
+        } catch (\Throwable $th) {
+            $response = [
+                'success' => false,
+                'message' => "Verifikasi email gagal"
+            ];
+
+            return response()->json($response, 500);
+        }
+    }
+
+    public function sendVerify(Request $request)
+    {
+        try {
+            $code = mt_rand(000000, 999999);
+            $user = Auth::user();
+            $user->update([
+                "code" => $code
+            ]);
+            $user->save();
+
+            $user->notify(new EmailVerification($user));
 
             $response = [
                 'success' => true,
-                'message' => "Akun berhasil dihapus"
+                'message' => "Email verifikasi berhasil terkirim"
             ];
 
             return response()->json($response, 200);
-        } else {
+        } catch (\Throwable $th) {
             $response = [
                 'success' => false,
-                'message' => "Akun gagal dihapus"
+                'message' => "Email verifikasi gagal terkirim"
             ];
 
             return response()->json($response, 500);
         }
-    }
-
-    public function logout(Request $request) {
-        $request->user()->currentAccessToken()->delete();
-
-        $response = [
-            'success' => true,
-            'message' => "Logout berhasil"
-        ];
-
-        return response()->json($response, 200);
     }
 }

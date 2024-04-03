@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
+use Validator;
 
 class PasswordResetLinkController extends Controller
 {
@@ -17,20 +18,18 @@ class PasswordResetLinkController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        $request->validate([
+        Validator::make($request->only('email'), [
             'email' => ['required', 'email'],
         ]);
 
         $status = Password::sendResetLink(
-            $request->only('email')
+            ["email" => $request->email]
         );
 
         if ($status != Password::RESET_LINK_SENT) {
-            throw ValidationException::withMessages([
-                'email' => [__($status)],
-            ]);
+            return response()->json(['message' => $status], 500);
         }
 
-        return response()->json(['status' => __($status)]);
+        return response()->json(['message' => "Email ubah kata sandi telah dikirim ke email " . $request->email], 200);
     }
 }

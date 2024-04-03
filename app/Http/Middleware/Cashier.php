@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class Admin
+class Cashier
 {
     /**
      * Handle an incoming request.
@@ -15,7 +15,7 @@ class Admin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if ($request->user()->role != 'admin') {
+        if ($request->user()->role != 'kasir') {
             $respons = [
                 "status" => false,
                 "message" => "Unauthorized"

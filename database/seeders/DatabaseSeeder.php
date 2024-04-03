@@ -24,18 +24,11 @@ class DatabaseSeeder extends Seeder
         ]);
 
         User::create([
-            "username" => "ahmad",
-            "email" => "ahmad@gmail.com",
-            "password" => "123123123",
-            "role" => "admin",
-            "id_toko" => 1
-        ]);
-
-        User::create([
-            "username" => "lusi",
+            "nama" => "Lusi Kuraisin",
             "email" => "lusi@gmail.com",
             "password" => "123123123",
-            "role" => "kasir",
+            "role" => "admin",
+            "code" => "928374",
             "id_toko" => 1
         ]);
 
@@ -55,6 +48,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Product::create([
+            "foto" => "burger.jpeg",
             "namaProduk" => "Burger",
             "id_kategori" => "1",
             "harga_beli" => 7000,
@@ -64,6 +58,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Product::create([
+            "foto" => "chicken.jpeg",
             "namaProduk" => "Fried Chicken",
             "id_kategori" => "1",
             "harga_beli" => 6000,
@@ -73,6 +68,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Product::create([
+            "foto" => "coca-cola.jpeg",
             "namaProduk" => "Coca Cola",
             "id_kategori" => "2",
             "harga_beli" => 4000,
@@ -82,6 +78,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Product::create([
+            "foto" => "french-fries.jpeg",
             "namaProduk" => "French Fries",
             "id_kategori" => "1",
             "harga_beli" => 7000,
@@ -91,6 +88,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Product::create([
+            "foto" => "sprite.jpg",
             "namaProduk" => "Sprite",
             "id_kategori" => "2",
             "harga_beli" => 4500,
