@@ -68,6 +68,7 @@ class CategoryController extends Controller
     public function update(int $id, Request $request)
     {
         try {
+            // return response()->json(['message' => $request->all()], 500);
             $validate = Validator::make($request->all(), [
                 'kategori' => 'required',
             ]);
@@ -82,7 +83,6 @@ class CategoryController extends Controller
             }
 
             Category::findOrFail($id)->update($request->all());
-            // return response()->json(['message' => $request->all()], 500);
 
             $response = [
                 'status' => true,

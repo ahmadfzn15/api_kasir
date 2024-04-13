@@ -37,7 +37,8 @@ class UserController extends Controller
     public function update(Request $request)
     {
         try {
-            $validated = Validator::make($request->all(), [
+            return response()->json(['message' => $request->all()], 500);
+            $validated = Validator::make($request, [
                 'nama' => 'required|string|max:255',
                 'email' => 'required|email',
             ]);
@@ -95,10 +96,10 @@ class UserController extends Controller
                 'new_password' => 'required',
             ]);
 
-            if ($validate->fails()) {
+            if ($validator->fails()) {
                 $response = [
                     'status' => false,
-                    'message' => $validate->errors()
+                    'message' => $validator->errors()
                 ];
 
                 return response()->json($respons, 500);
@@ -108,15 +109,14 @@ class UserController extends Controller
             if (!Hash::check($request->current_password, $user->password)) {
                 $response = [
                     'status' => false,
-                    'message' => "Kata sandi yang anda masukkan salah"
+                    'message' => "Kata sandi saat ini yang anda masukkan salah"
                 ];
 
                 return response()->json($respons, 500);
             }
 
             $user->forceFill([
-                    'password' => Hash::make($request->password),
-                    'remember_token' => Str::random(60),
+                    'password' => Hash::make($request->new_password),
                 ])->save();
 
             $response = [

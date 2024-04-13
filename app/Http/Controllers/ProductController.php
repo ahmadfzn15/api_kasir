@@ -121,11 +121,14 @@ class ProductController extends Controller
     {
         try {
             $validate = Validator::make($request->all(), [
-                'foto' => 'nullable|image|mimes:png,jpg,jpeg',
-                'namaProduk' => 'required',
+                'old_img' => 'nullable|string',
+                'new_img' => 'nullable|image',
+                'namaProduk' => 'required|string',
+                'barcode' => 'nullable|string',
                 'id_kategori' => 'required',
                 'harga_beli' => 'required',
                 'harga_jual' => 'required',
+                'deskripsi' => 'nullable|string',
             ]);
 
             if ($validate->fails()) {
@@ -137,19 +140,22 @@ class ProductController extends Controller
                 return response()->json($respons, 500);
             }
 
+
             $product = Product::findOrFail($id);
-            $imageName = null;
-            if ($request->hasFile('foto')) {
+            $new_img = null;
+            if ($request->hasFile('new_img')) {
                 if ($product->foto) {
                     Storage::delete("img/" . $product->foto);
                 }
-                $image = $request->file('foto');
-                $imageName = time().'.'.$image->getClientOriginalExtension();
-                $image->storeAs('public/img', $imageName);
+                $image = $request->file('new_img');
+                $new_img = time().'.'.$image->getClientOriginalExtension();
+                $image->storeAs('public/img', $new_img);
+            } else if ($product->foto && !$request->old_img) {
+                Storage::delete("img/" . $product->foto);
             }
 
             $product->update([
-                "foto" => $imageName,
+                "foto" => $new_img ?? $request->old_img,
                 "namaProduk" => $request->namaProduk,
                 "barcode" => $request->barcode,
                 "id_kategori" => $request->id_kategori,

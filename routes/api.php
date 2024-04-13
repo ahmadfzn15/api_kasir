@@ -24,7 +24,7 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::controller(UserController::class)->group(function() {
         Route::get('/user', 'index');
-        Route::post('/user/update', 'update');
+        Route::put('/user/update', 'update');
         Route::put('/user/change-password', 'changePassword');
         Route::delete('/user/{id}', 'destroy');
     });
@@ -38,7 +38,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/product', 'index');
         Route::post('/product', 'store');
         Route::post('/product/{id}', 'update');
-        Route::delete('/product/{id}', 'destroy');
+        Route::delete('/product', 'destroy');
     });
 
     Route::apiResource('/category', CategoryController::class);

@@ -16,8 +16,14 @@ class SaleController extends Controller
     public function index(Request $request, Sale $sale, SaleDetail $saleDetail)
     {
         try {
-            $id_toko = $request->user()->id_toko;
-            $history = $sale->with('cashier')->where('id_toko', $id_toko)->latest()->get();
+            $user = $request->user();
+            $history;
+            if ($user->role == "admin") {
+                $history = $sale->with('cashier')->where('id_toko', $user->id_toko)->latest()->get();
+            } else {
+                $history = $sale->where('id_toko', $user->id_toko)->where('id_kasir', $user->id)->latest()->get();
+            }
+
 
             $data = [
                 "success" => true,
@@ -80,15 +86,15 @@ class SaleController extends Controller
                     'message' => $validate->errors()
                 ];
 
-                return response()->json($respons, 500);
+                return response()->json($response, 500);
             }
             $user = $request->user();
 
-            $kode = Str::random(6);
+            $kode = Str::random(10);
             $nomor_struk = $sale->where('kode', $kode)->get();
 
             while ($nomor_struk) {
-                $kode = Str::random(6);
+                $kode = Str::random(10);
                 $nomor_struk = $sale->where("kode", $kode)->first();
                 if ($nomor_struk) {
                     continue;
