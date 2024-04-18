@@ -94,6 +94,7 @@ class ProductController extends Controller
                 "namaProduk" => $request->namaProduk,
                 "barcode" => $request->barcode,
                 "id_kategori" => $request->id_kategori,
+                "variant" => $request->variant,
                 "id_toko" => $id,
                 "harga_beli" => $request->harga_beli,
                 "harga_jual" => $request->harga_jual,

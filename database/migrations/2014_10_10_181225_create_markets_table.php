@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('markets', function (Blueprint $table) {
             $table->id();
+            $table->string('logo')->nullable();
             $table->string('nama_toko');
             $table->string('alamat');
             $table->string('no_tlp');

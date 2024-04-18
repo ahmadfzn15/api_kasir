@@ -24,7 +24,7 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::controller(UserController::class)->group(function() {
         Route::get('/user', 'index');
-        Route::put('/user/update', 'update');
+        Route::post('/user/update', 'update');
         Route::put('/user/change-password', 'changePassword');
         Route::delete('/user/{id}', 'destroy');
     });
@@ -41,14 +41,17 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::delete('/product', 'destroy');
     });
 
+    Route::controller(MarketController::class)->group(function() {
+        Route::get('/market', 'index');
+        Route::post('/market', 'store');
+        Route::post('/market/{id}', 'update');
+        Route::delete('/market', 'destroy');
+        Route::delete('/market/{id}/reset', 'clear');
+    });
+
     Route::apiResource('/category', CategoryController::class);
     Route::apiResource('/cashier', EmployeeController::class);
     Route::apiResource('/variant', VariantController::class);
-    Route::apiResource('/market', MarketController::class);
-
-    Route::controller(MarketController::class)->group(function() {
-        Route::delete('/market/{id}/reset', 'clear');
-    });
 
     Route::controller(ProductController::class)->group(function() {
         Route::post('/product/delete', 'destroy');

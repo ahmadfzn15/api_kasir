@@ -42,6 +42,7 @@ class MarketController extends Controller
         DB::beginTransaction();
         try {
             $validate = Validator::make($request->all(), [
+                'logo' => 'nullable|image|mimes:png,jpg,jpeg',
                 'nama_toko' => 'required|string',
                 'alamat' => 'required|string',
                 'no_tlp' => 'required|string',
@@ -57,7 +58,22 @@ class MarketController extends Controller
                 return response()->json($respons, 500);
             }
 
-            $market = Market::create($request->all());
+            $id = $request->user()->id_toko;
+            $imageName = null;
+
+            if ($request->hasFile('logo')) {
+                $image = $request->file('logo');
+                $imageName = time().'.'.$image->getClientOriginalExtension();
+                $image->storeAs('public/img', $imageName);
+            }
+
+            $market = Market::create([
+                "logo" => $imageName,
+                "nama_toko" => $request->nama_toko,
+                "alamat" => $request->alamat,
+                "no_tlp" => $request->no_tlp,
+                "bidang_usaha" => $request->bidang_usaha,
+            ]);
 
             $request->user()->fill([
                 "id_toko" => $market->id
@@ -87,6 +103,8 @@ class MarketController extends Controller
     {
         try {
             $validate = Validator::make($request->all(), [
+                'old_img' => 'nullable|string',
+                'new_img' => 'nullable|image',
                 'nama_toko' => 'required|string',
                 'alamat' => 'required|string',
                 'no_tlp' => 'required|string',
@@ -102,7 +120,26 @@ class MarketController extends Controller
                 return response()->json($respons, 200);
             }
 
-            Market::findOrFail($id)->update($request->all());
+            $product = Market::findOrFail($id);
+            $new_img = null;
+            if ($request->hasFile('new_img')) {
+                if ($product->logo) {
+                    Storage::delete("img/" . $product->logo);
+                }
+                $image = $request->file('new_img');
+                $new_img = time().'.'.$image->getClientOriginalExtension();
+                $image->storeAs('public/img', $new_img);
+            } else if ($product->logo && !$request->old_img) {
+                Storage::delete("img/" . $product->logo);
+            }
+
+            Market::findOrFail($id)->update([
+                "logo" => $new_img ?? $request->old_img,
+                "nama_toko" => $request->nama_toko,
+                "alamat" => $request->alamat,
+                "no_tlp" => $request->no_tlp,
+                "bidang_usaha" => $request->bidang_usaha,
+            ]);
 
             $response = [
                 'status' => true,

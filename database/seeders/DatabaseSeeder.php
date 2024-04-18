@@ -47,8 +47,7 @@ class DatabaseSeeder extends Seeder
             "id_toko" => 1
         ]);
 
-        for ($i=0; $i < 10; $i++) {
-            Product::create([
+        Product::create([
             "foto" => "burger.jpeg",
             "namaProduk" => "Burger",
             "id_kategori" => "1",
@@ -115,6 +114,5 @@ class DatabaseSeeder extends Seeder
             "stok" => 10,
             "id_toko" => 1
         ]);
-        }
     }
 }

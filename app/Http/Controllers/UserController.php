@@ -37,8 +37,9 @@ class UserController extends Controller
     public function update(Request $request)
     {
         try {
-            return response()->json(['message' => $request->all()], 500);
-            $validated = Validator::make($request, [
+            $validated = Validator::make($request->all(), [
+                'old_img' => 'nullable|string',
+                'new_img' => 'nullable|image',
                 'nama' => 'required|string|max:255',
                 'email' => 'required|email',
             ]);
@@ -47,25 +48,26 @@ class UserController extends Controller
                 $response = [
                     'success' => false,
                     'message' => $validated->errors(),
-                    'request' => $request->all()
                 ];
 
                 return response()->json($response, 500);
             }
 
             $user = $request->user();
-            $imageName = null;
-            if ($request->hasFile('foto')) {
+            $new_img = null;
+            if ($request->hasFile('new_img')) {
                 if ($user->foto) {
                     Storage::delete("img/" . $user->foto);
                 }
-                $image = $request->file('foto');
-                $imageName = time().'.'.$image->getClientOriginalExtension();
-                $image->storeAs('public/img', $imageName);
+                $image = $request->file('new_img');
+                $new_img = time().'.'.$image->getClientOriginalExtension();
+                $image->storeAs('public/img', $new_img);
+            } else if ($user->foto && !$request->has('old_img')) {
+                Storage::delete("img/" . $user->foto);
             }
 
             $user->fill([
-                'foto' => $imageName,
+                'foto' => $new_img ?? $request->old_img,
                 'nama' => $request->nama,
                 'email' => $request->email,
                 'no_tlp' => $request->no_tlp,

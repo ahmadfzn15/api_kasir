@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('variants', function (Blueprint $table) {
             $table->id();
             $table->foreignId('id_toko')->constrained('markets')->onDelete('cascade');
-            $table->string('variant')->unique();
+            $table->string('name');
             $table->timestamps();
         });
     }

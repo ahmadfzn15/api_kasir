@@ -14,12 +14,13 @@ return new class extends Migration
         Schema::create('sales', function (Blueprint $table) {
             $table->id();
             $table->string('kode');
+            $table->string('nama_pelanggan')->nullable();
             $table->foreignId('id_toko')->constrained('markets')->onDelete('cascade');
             $table->foreignId('id_kasir')->constrained('users')->onDelete('cascade');
-            $table->integer('cash');
-            $table->integer('cashback');
+            $table->integer('cash')->nullable();
+            $table->integer('cashback')->nullable();
             $table->integer('total_harga');
-            $table->enum('status', ['Lunas', 'Belum Lunas'])->default('Lunas');
+            $table->boolean('status')->default(true);
             $table->integer('biaya_tambahan')->nullable();
             $table->string('deskripsi_biaya_tambahan')->nullable();
             $table->integer('diskon')->nullable();

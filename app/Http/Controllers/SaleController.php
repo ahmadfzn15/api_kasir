@@ -73,10 +73,10 @@ class SaleController extends Controller
         DB::beginTransaction();
         try {
             $validate = Validator::make($request->all(), [
-                'cash' => 'required|integer',
-                'cashback' => 'required|integer',
+                'cash' => 'nullable|integer',
+                'cashback' => 'nullable|integer',
                 'total_harga' => 'required|integer',
-                'status' => 'required|string',
+                'status' => 'required|boolean',
                 'total_pembayaran' => 'required|integer',
             ]);
 
@@ -103,12 +103,13 @@ class SaleController extends Controller
 
             $sales = $sale->create([
                 "kode" => $kode,
+                "nama_pelanggan" => $request->nama_pelanggan,
                 "id_toko" => $user->id_toko,
                 "id_kasir" => $user->id,
                 "cash" => $request->cash,
                 "cashback" => $request->cashback,
                 "total_harga" => $request->total_harga,
-                "status" => $request->status == "Tunai" ? "Lunas" : "Belum Lunas",
+                "status" => $request->status,
                 "biaya_tambahan" => $request->biaya_tambahan,
                 "deskripsi_biaya_tambahan" => $request->deskripsi_biaya_tambahan,
                 "diskon" => $request->diskon,
@@ -147,45 +148,6 @@ class SaleController extends Controller
             ];
 
             DB::rollback();
-            return response()->json($response, 500);
-        }
-    }
-
-    public function update(int $id, Request $request, Sale $sale)
-    {
-        try {
-            $validate = Validator::make($request->all(), [
-                'id_pelanggan' => 'nullable|numeric',
-                'total_harga' => 'required|integer',
-                'metode_pembayaran' => 'required',
-                'status' => 'required',
-                'diskon' => 'nullable|integer',
-                'total_pembayaran' => 'required|integer',
-            ]);
-
-            if ($validate->fails()) {
-                $response = [
-                    'status' => false,
-                    'message' => $validate->errors
-                ];
-
-                return response()->json($respons, 500);
-            }
-
-            $sale->findOrFail($id)->update($request->all());
-
-            $response = [
-                'status' => true,
-                'message' => 'Data penjualan berhasil diubah'
-            ];
-
-            return response()->json($response, 200);
-        } catch (\Throwable $th) {
-            $response = [
-                'status' => false,
-                'message' => 'Data penjualan gagal diubah'
-            ];
-
             return response()->json($response, 500);
         }
     }

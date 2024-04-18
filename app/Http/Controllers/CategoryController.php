@@ -43,18 +43,28 @@ class CategoryController extends Controller
                 return response()->json($respons, 500);
             }
             $user = $request->user();
+            $category = Category::where('id_toko', $user->id_toko)->where('kategori', $request->kategori)->get();
 
-            Category::create([
-                "id_toko" => $user->id_toko,
-                "kategori" => $request->kategori
-            ]);
+            if ($category->count()) {
+                $response = [
+                    'status' => false,
+                    'message' => 'Kategori sudah ada'
+                ];
 
-            $response = [
-                'status' => true,
-                'message' => 'Kategori baru berhasil ditambahkan'
-            ];
+                return response()->json($response, 500);
+            } else {
+                Category::create([
+                    "id_toko" => $user->id_toko,
+                    "kategori" => $request->kategori
+                ]);
 
-            return response()->json($response, 200);
+                $response = [
+                    'status' => true,
+                    'message' => 'Kategori baru berhasil ditambahkan'
+                ];
+
+                return response()->json($response, 200);
+            }
         } catch (\Throwable $th) {
             $response = [
                 'status' => false,
@@ -68,7 +78,6 @@ class CategoryController extends Controller
     public function update(int $id, Request $request)
     {
         try {
-            // return response()->json(['message' => $request->all()], 500);
             $validate = Validator::make($request->all(), [
                 'kategori' => 'required',
             ]);
