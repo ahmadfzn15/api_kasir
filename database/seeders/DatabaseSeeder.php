@@ -24,9 +24,9 @@ class DatabaseSeeder extends Seeder
         ]);
 
         User::create([
-            "nama" => "Lusi Kuraisin",
-            "email" => "lusi@gmail.com",
-            "password" => "123123123",
+            "nama" => "Ahmad Fauzan",
+            "email" => "ahmad@gmail.com",
+            "password" => "123",
             "role" => "admin",
             "code" => "928374",
             "id_toko" => 1

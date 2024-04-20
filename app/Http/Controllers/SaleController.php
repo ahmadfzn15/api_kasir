@@ -24,7 +24,6 @@ class SaleController extends Controller
                 $history = $sale->where('id_toko', $user->id_toko)->where('id_kasir', $user->id)->latest()->get();
             }
 
-
             $data = [
                 "success" => true,
                 "message" => "Data histori",
@@ -33,12 +32,12 @@ class SaleController extends Controller
 
             return response()->json($data, 200);
         } catch (\Throwable $th) {
-            $data = [
+            $response = [
                 "success" => false,
-                "message" => "Gagal mengambil data histori",
+                "message" => "Terjadi Kesalahan"
             ];
 
-            return response()->json($data, 500);
+            return response()->json($response, 500);
         }
     }
 
@@ -59,12 +58,12 @@ class SaleController extends Controller
 
             return response()->json($data, 200);
         } catch (\Throwable $th) {
-            $data = [
+            $response = [
                 "success" => false,
-                "message" => "Gagal mengambil detail histori",
+                "message" => "Terjadi Kesalahan"
             ];
 
-            return response()->json($data, 500);
+            return response()->json($response, 500);
         }
     }
 
@@ -73,7 +72,7 @@ class SaleController extends Controller
         DB::beginTransaction();
         try {
             $validate = Validator::make($request->all(), [
-                'cash' => 'nullable|integer',
+                'cash' => 'nullable|string',
                 'cashback' => 'nullable|integer',
                 'total_harga' => 'required|integer',
                 'status' => 'required|boolean',
@@ -86,7 +85,7 @@ class SaleController extends Controller
                     'message' => $validate->errors()
                 ];
 
-                return response()->json($response, 500);
+                return response()->json($response, 400);
             }
             $user = $request->user();
 
@@ -142,12 +141,12 @@ class SaleController extends Controller
 
             return response()->json($response, 200);
         } catch (\Throwable $th) {
+            DB::rollback();
             $response = [
-                'success' => false,
-                'message' => 'Pembayaran gagal'
+                "success" => false,
+                "message" => "Terjadi Kesalahan"
             ];
 
-            DB::rollback();
             return response()->json($response, 500);
         }
     }
@@ -166,8 +165,8 @@ class SaleController extends Controller
             return response()->json($response, 200);
         } catch (\Throwable $th) {
             $response = [
-                'status' => false,
-                'message' => 'Data penjualan gagal dihapus'
+                "success" => false,
+                "message" => "Terjadi Kesalahan"
             ];
 
             return response()->json($response, 500);
@@ -220,12 +219,12 @@ class SaleController extends Controller
 
             return response()->json($data, 200);
         } catch (\Throwable $th) {
-            $data = [
+            $response = [
                 "success" => false,
-                "message" => "Gagal mengambil data penjualan",
+                "message" => "Terjadi Kesalahan"
             ];
 
-            return response()->json($data, 500);
+            return response()->json($response, 500);
         }
     }
 }

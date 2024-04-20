@@ -29,8 +29,8 @@ class MarketController extends Controller
             return response()->json($response, 200);
         } catch (\Throwable $th) {
             $response = [
-                "status" => false,
-                "message" => "Gagal mengambil data toko",
+                "success" => false,
+                "message" => "Terjadi Kesalahan"
             ];
 
             return response()->json($response, 500);
@@ -55,7 +55,7 @@ class MarketController extends Controller
                     'message' => $validate->errors()
                 ];
 
-                return response()->json($respons, 500);
+                return response()->json($respons, 400);
             }
 
             $id = $request->user()->id_toko;
@@ -91,8 +91,8 @@ class MarketController extends Controller
             DB::rollback();
 
             $response = [
-                'status' => false,
-                'message' => 'Toko baru gagal didaftarkan'
+                "success" => false,
+                "message" => "Terjadi Kesalahan"
             ];
 
             return response()->json($response, 500);
@@ -117,7 +117,7 @@ class MarketController extends Controller
                     'message' => $validate->errors()
                 ];
 
-                return response()->json($respons, 200);
+                return response()->json($respons, 400);
             }
 
             $product = Market::findOrFail($id);
@@ -149,8 +149,8 @@ class MarketController extends Controller
             return response()->json($response, 200);
         } catch (\Throwable $th) {
             $response = [
-                'status' => false,
-                'message' => 'Data toko gagal diubah'
+                "success" => false,
+                "message" => "Terjadi Kesalahan"
             ];
 
             return response()->json($response, 500);
@@ -175,8 +175,8 @@ class MarketController extends Controller
             DB::rollback();
 
             $response = [
-                'status' => false,
-                'message' => 'Toko gagal dihapus'
+                "success" => false,
+                "message" => "Terjadi Kesalahan"
             ];
 
             return response()->json($response, 500);
@@ -205,8 +205,8 @@ class MarketController extends Controller
             DB::rollback();
 
             $response = [
-                'status' => false,
-                'message' => 'Data gagal direset'
+                "success" => false,
+                "message" => "Terjadi Kesalahan"
             ];
 
             return response()->json($response, 500);

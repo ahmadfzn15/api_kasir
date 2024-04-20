@@ -26,8 +26,7 @@ class EmployeeController extends Controller
         } catch (\Throwable $th) {
             $response = [
                 "success" => false,
-                "data" => $data,
-                "message" => "Gagal mengambil data kasir"
+                "message" => "Terjadi Kesalahan"
             ];
 
             return response()->json($response, 500);
@@ -51,7 +50,7 @@ class EmployeeController extends Controller
                     'message' => $validate->errors()
                 ];
 
-                return response()->json($respons, 500);
+                return response()->json($respons, 400);
             }
 
             User::create([
@@ -59,7 +58,7 @@ class EmployeeController extends Controller
                 "email" => $request->email,
                 "no_tlp" => $request->no_tlp,
                 "password" => Hash::make($request->password),
-                "role" => $request->role == 1 ? "staff kasir" : "staff inventaris",
+                "role" => "staff kasir",
                 "id_toko" => $id_toko,
             ]);
 
@@ -71,8 +70,8 @@ class EmployeeController extends Controller
             return response()->json($response, 200);
         } catch (\Throwable $th) {
             $response = [
-                'success' => false,
-                'message' => 'Kasir baru gagal ditambahkan'
+                "success" => false,
+                "message" => "Terjadi Kesalahan"
             ];
 
             return response()->json($response, 500);
@@ -95,7 +94,7 @@ class EmployeeController extends Controller
                     'message' => $validate->errors()
                 ];
 
-                return response()->json($respons, 500);
+                return response()->json($respons, 400);
             }
 
             User::findOrFail($id)->update([
@@ -113,8 +112,8 @@ class EmployeeController extends Controller
             return response()->json($response, 200);
         } catch (\Throwable $th) {
             $response = [
-                'success' => false,
-                'message' => 'Kasir baru gagal diubah'
+                "success" => false,
+                "message" => "Terjadi Kesalahan"
             ];
 
             return response()->json($response, 500);

@@ -27,7 +27,7 @@ class UserController extends Controller
         } catch (\Throwable $th) {
             $response = [
                 "success" => false,
-                "message" => "Gagal mengambil data user"
+                "message" => "Terjadi Kesalahan"
             ];
 
             return response()->json($response, 500);
@@ -38,7 +38,7 @@ class UserController extends Controller
     {
         try {
             $validated = Validator::make($request->all(), [
-                'old_img' => 'nullable|string',
+                'old_img' => 'nullable|string', 
                 'new_img' => 'nullable|image',
                 'nama' => 'required|string|max:255',
                 'email' => 'required|email',
@@ -50,7 +50,7 @@ class UserController extends Controller
                     'message' => $validated->errors(),
                 ];
 
-                return response()->json($response, 500);
+                return response()->json($response, 400);
             }
 
             $user = $request->user();
@@ -83,7 +83,7 @@ class UserController extends Controller
         } catch (\Throwable $th) {
             $response = [
                 "success" => false,
-                "message" => "Profil gagal diubah"
+                "message" => "Terjadi Kesalahan"
             ];
 
             return response()->json($response, 500);
@@ -104,7 +104,7 @@ class UserController extends Controller
                     'message' => $validator->errors()
                 ];
 
-                return response()->json($respons, 500);
+                return response()->json($respons, 400);
             }
 
             $user = $request->user();
@@ -114,7 +114,7 @@ class UserController extends Controller
                     'message' => "Kata sandi saat ini yang anda masukkan salah"
                 ];
 
-                return response()->json($respons, 500);
+                return response()->json($respons, 400);
             }
 
             $user->forceFill([
@@ -130,29 +130,51 @@ class UserController extends Controller
         } catch (\Throwable $th) {
             $response = [
                 'success' => false,
-                'message' => "Kata sandi gagal diubah"
+                'message' => "Terjadi Kesalahan"
             ];
 
             return response()->json($response, 500);
         }
     }
 
-    public function destroy(int $id, Request $request)
+    public function destroy(Request $request)
     {
         try {
-            $user = User::findOrFail($id);
-            $user->delete();
+            $validator = Validator::make($request->all(), [
+                'password' => 'required',
+            ]);
 
-            $response = [
-                'success' => true,
-                'message' => "Akun berhasil dihapus"
-            ];
+            if ($validator->fails()) {
+                $response = [
+                    'status' => false,
+                    'message' => $validator->errors()
+                ];
 
-            return response()->json($response, 200);
+                return response()->json($respons, 400);
+            }
+
+            if (Hash::check($request->password, $request->user()->password)) {
+                $user = User::findOrFail($request->user()->id);
+                $user->delete();
+
+                $response = [
+                    'success' => true,
+                    'message' => "Akun berhasil dihapus"
+                ];
+
+                return response()->json($response, 200);
+            } else {
+                $response = [
+                    'success' => false,
+                    'message' => "Akun gagal dihapus"
+                ];
+
+                return response()->json($response, 400);
+            }
         } catch (\Throwable $th) {
             $response = [
                 'success' => false,
-                'message' => "Akun gagal dihapus"
+                'message' => "Terjadi Kesalahan"
             ];
 
             return response()->json($response, 500);

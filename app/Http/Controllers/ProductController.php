@@ -30,8 +30,8 @@ class ProductController extends Controller
             return response()->json($response, 200);
         } catch (\Throwable $th) {
             $response = [
-                "status" => true,
-                "message" => "Gagal mengambil data produk.",
+                "success" => false,
+                "message" => "Terjadi Kesalahan"
             ];
 
             return response()->json($response, 500);
@@ -52,8 +52,8 @@ class ProductController extends Controller
             return response()->json($response, 200);
         } catch (\Throwable $th) {
             $response = [
-                "status" => true,
-                "message" => "Gagal mengambil detail produk produk",
+                "success" => false,
+                "message" => "Terjadi Kesalahan"
             ];
 
             return response()->json($response, 500);
@@ -77,7 +77,7 @@ class ProductController extends Controller
                     'message' => $validate->errors()
                 ];
 
-                return response()->json($respons, 500);
+                return response()->json($respons, 400);
             }
 
             $id = $request->user()->id_toko;
@@ -110,8 +110,8 @@ class ProductController extends Controller
             return response()->json($response, 200);
         } catch (\Throwable $th) {
             $response = [
-                'status' => true,
-                'message' => 'Produk baru gagal ditambahkan'
+                "success" => false,
+                "message" => "Terjadi Kesalahan"
             ];
 
             return response()->json($response, 500);
@@ -138,7 +138,7 @@ class ProductController extends Controller
                     'message' => $validate->errors()
                 ];
 
-                return response()->json($respons, 500);
+                return response()->json($respons, 400);
             }
 
 
@@ -149,7 +149,7 @@ class ProductController extends Controller
                     Storage::delete("img/" . $product->foto);
                 }
                 $image = $request->file('new_img');
-                $new_img = time().'.'.$image->getClientOriginalExtension();
+                $new_img = time().'.'.  $image->getClientOriginalExtension();
                 $image->storeAs('public/img', $new_img);
             } else if ($product->foto && !$request->old_img) {
                 Storage::delete("img/" . $product->foto);
@@ -173,10 +173,9 @@ class ProductController extends Controller
 
             return response()->json($response, 200);
         } catch (\Throwable $th) {
-
             $response = [
-                'status' => false,
-                'message' => "Data produk gagal diubah"
+                "success" => false,
+                "message" => "Terjadi Kesalahan"
             ];
 
             return response()->json($response, 500);
@@ -203,8 +202,8 @@ class ProductController extends Controller
             DB::rollback();
 
             $response = [
-                'status' => true,
-                'message' => 'Data gagal dihapus'
+                "success" => false,
+                "message" => "Terjadi Kesalahan"
             ];
 
             return response()->json($response, 500);

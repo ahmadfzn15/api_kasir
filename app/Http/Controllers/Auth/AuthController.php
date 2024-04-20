@@ -29,7 +29,7 @@ class AuthController extends Controller
                     'message' => "Email dan password wajib diisi!"
                 ];
 
-                return response()->json($response, 500);
+                return response()->json($response, 400);
             }
 
             if (!Auth::attempt($request->all())) {
@@ -38,7 +38,7 @@ class AuthController extends Controller
                     'message' => "Email atau password yang anda masukkan salah."
                 ];
 
-                return response()->json($response, 500);
+                return response()->json($response, 400);
             }
 
             $user = User::where('email', $request->email)->first();
@@ -56,8 +56,8 @@ class AuthController extends Controller
             return response()->json($response, 200);
         } catch (\Throwable $th) {
             $response = [
-                'success' => false,
-                'message' => "Login gagal"
+                "success" => false,
+                "message" => "Terjadi Kesalahan"
             ];
 
             return response()->json($response, 500);
@@ -79,7 +79,7 @@ class AuthController extends Controller
                     'message' => $validated->errors()
                 ];
 
-                return response()->json($response, 500);
+                return response()->json($response, 400);
             }
 
             $code = mt_rand(000000, 999999);
@@ -108,8 +108,8 @@ class AuthController extends Controller
             return response()->json($response, 200);
         } catch (\Throwable $th) {
             $response = [
-                'success' => false,
-                'message' => "Daftar gagal"
+                "success" => false,
+                "message" => "Terjadi Kesalahan"
             ];
 
             return response()->json($response, 500);

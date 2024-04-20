@@ -23,7 +23,12 @@ class CategoryController extends Controller
 
             return response()->json($data, 200);
         } catch (\Throwable $th) {
-            return response()->json($th, 500);
+            $response = [
+                "success" => false,
+                "message" => "Terjadi Kesalahan"
+            ];
+
+            return response()->json($response, 500);
         }
     }
 
@@ -40,7 +45,7 @@ class CategoryController extends Controller
                     'message' => $validate->errors()
                 ];
 
-                return response()->json($respons, 500);
+                return response()->json($respons, 400);
             }
             $user = $request->user();
             $category = Category::where('id_toko', $user->id_toko)->where('kategori', $request->kategori)->get();
@@ -51,7 +56,7 @@ class CategoryController extends Controller
                     'message' => 'Kategori sudah ada'
                 ];
 
-                return response()->json($response, 500);
+                return response()->json($response, 400);
             } else {
                 Category::create([
                     "id_toko" => $user->id_toko,
@@ -67,8 +72,8 @@ class CategoryController extends Controller
             }
         } catch (\Throwable $th) {
             $response = [
-                'status' => false,
-                'message' => 'Kategori baru gagal ditambahkan'
+                "success" => false,
+                "message" => "Terjadi Kesalahan"
             ];
 
             return response()->json($response, 500);
@@ -88,7 +93,7 @@ class CategoryController extends Controller
                     'message' => $validate->errors
                 ];
 
-                return response()->json($respons, 500);
+                return response()->json($respons, 400);
             }
 
             Category::findOrFail($id)->update($request->all());
@@ -101,8 +106,8 @@ class CategoryController extends Controller
             return response()->json($response, 200);
         } catch (\Throwable $th) {
             $response = [
-                'status' => false,
-                'message' => 'Kategori gagal diubah'
+                "success" => false,
+                "message" => "Terjadi Kesalahan"
             ];
 
             return response()->json($response, 500);
@@ -123,8 +128,8 @@ class CategoryController extends Controller
             return response()->json($response, 200);
         } catch (\Throwable $th) {
             $response = [
-                'status' => true,
-                'message' => 'Data gagal dihapus'
+                "success" => false,
+                "message" => "Terjadi Kesalahan"
             ];
 
             return response()->json($response, 500);

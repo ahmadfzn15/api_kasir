@@ -21,7 +21,12 @@ class VariantController extends Controller
 
             return response()->json($data, 200);
         } catch (\Throwable $th) {
-            return response()->json($th, 500);
+            $response = [
+                "success" => false,
+                "message" => "Terjadi Kesalahan"
+            ];
+
+            return response()->json($response, 500);
         }
     }
 
@@ -35,10 +40,10 @@ class VariantController extends Controller
             if ($validate->fails()) {
                 $response = [
                     'status' => false,
-                    'message' => $validate->errors
+                    'message' => $validate->errors()
                 ];
 
-                return response()->json($respons, 200);
+                return response()->json($respons, 400);
             }
 
             Variant::create($request->all());
@@ -50,7 +55,12 @@ class VariantController extends Controller
 
             return response()->json($response, 200);
         } catch (\Throwable $th) {
-            return response()->json($th, 200);
+            $response = [
+                "success" => false,
+                "message" => "Terjadi Kesalahan"
+            ];
+
+            return response()->json($response, 500);
         }
     }
 
@@ -63,11 +73,11 @@ class VariantController extends Controller
 
             if ($validate->fails()) {
                 $response = [
-                'status' => false,
-                'message' => $validate->errors
-            ];
+                    'status' => false,
+                    'message' => $validate->errors()
+                ];
 
-                return response()->json($respons, 200);
+                return response()->json($respons, 400);
             }
 
             $variant = Variant::findOrFail($id);
@@ -80,7 +90,12 @@ class VariantController extends Controller
 
             return response()->json($response, 200);
         } catch (\Throwable $th) {
-            return response()->json($th, 500);
+            $response = [
+                "success" => false,
+                "message" => "Terjadi Kesalahan"
+            ];
+
+            return response()->json($response, 500);
         }
     }
 
@@ -97,7 +112,12 @@ class VariantController extends Controller
 
             return response()->json($response, 200);
         } catch (\Throwable $th) {
-            return response()->json($th, 500);
+            $response = [
+                "success" => false,
+                "message" => "Terjadi Kesalahan"
+            ];
+
+            return response()->json($response, 500);
         }
     }
 }

@@ -22,12 +22,12 @@ class StrukController extends Controller
 
             return response()->json($data, 200);
         } catch (\Throwable $th) {
-            $data = [
+            $response = [
                 "success" => false,
-                "message" => "Gagal mengambil data struk",
+                "message" => "Terjadi Kesalahan"
             ];
 
-            return response()->json($data, 500);
+            return response()->json($response, 500);
         }
     }
 }

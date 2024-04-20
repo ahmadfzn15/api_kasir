@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('no_tlp')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->enum('role', ['admin', 'staff kasir', 'staff inventaris']);
+            $table->enum('role', ['admin', 'staff kasir']);
             $table->string('code')->nullable();
             $table->foreignId('id_toko')->nullable()->constrained('markets')->onDelete('cascade');
             $table->timestamps();

@@ -18,7 +18,7 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
-
+    Route::apiResource('/cashier', EmployeeController::class);
 });
 
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -26,7 +26,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/user', 'index');
         Route::post('/user/update', 'update');
         Route::put('/user/change-password', 'changePassword');
-        Route::delete('/user/{id}', 'destroy');
+        Route::delete('/user/delete', 'destroy');
     });
 
     Route::controller(AuthController::class)->group(function() {
@@ -50,7 +50,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 
     Route::apiResource('/category', CategoryController::class);
-    Route::apiResource('/cashier', EmployeeController::class);
     Route::apiResource('/variant', VariantController::class);
 
     Route::controller(ProductController::class)->group(function() {
