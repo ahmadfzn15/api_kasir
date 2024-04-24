@@ -41,7 +41,7 @@ class EmployeeController extends Controller
             $validate = Validator::make($request->all(), [
                 'nama' => 'required|string',
                 'email' => 'required|email|unique:users',
-                'password' => 'required'
+                'password' => 'required|string|min:6'
             ]);
 
             if ($validate->fails()) {
